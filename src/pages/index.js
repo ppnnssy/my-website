@@ -8,6 +8,9 @@ import Heading from '@theme/Heading';
 import styles from './index.module.css';
 import "./timeLine.min.css"
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import timeLineData from './timeLineData'
+
+
 
 
 export default function Home() {
@@ -23,7 +26,7 @@ export default function Home() {
       <main>
       <div className="timeLine-container">
           <div className="entries">
-            {timelineList.map((item) => {
+            {timeLineData.map((item) => {
               return (
                 <div className="entry" key={item.title}>
                   <Link to={item.filePath + "/" + item.title} className="title">
