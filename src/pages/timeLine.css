@@ -50,14 +50,14 @@ main {
   margin-top: -120px;
 }
 
-.timeLine-container .entries .entry .title {
+.timeLine-container .entries .entry .titleWrap .title {
   font-size: 30px;
   margin-bottom: 12px;
   position: relative;
   color: var(--ifm-font-color-base);
 }
 
-.timeLine-container .entries .entry .title:before {
+.timeLine-container .entries .entry .titleWrap .title:before {
   content: "";
   position: absolute;
   width: 8px;
@@ -70,10 +70,16 @@ main {
   right: -73px;
 }
 
-.timeLine-container .entries .entry .title.big:before {
+.timeLine-container .entries .entry .titleWrap .title.big:before {
   width: 24px;
   height: 24px;
   transform: translate(8px, -50%);
+}
+
+.timeLine-container .entries .entry .titleWrap .time {
+  font-size: 14px;
+  color: var(--ifm-color-secondary-darkest);
+  margin-bottom: 10px;
 }
 
 .timeLine-container .entries .entry .body {
@@ -87,7 +93,6 @@ main {
   line-height: 1.4em;
   flex-grow: 1;
   width: 50%;
-  margin: 0 20px;
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
