@@ -47,11 +47,11 @@ main {
 }
 
 .timeLine-container .entries .entry:not(:first-child) {
-  margin-top: -60px;
+  margin-top: -120px;
 }
 
 .timeLine-container .entries .entry .title {
-  font-size: 32px;
+  font-size: 30px;
   margin-bottom: 12px;
   position: relative;
   color: var(--ifm-font-color-base);
