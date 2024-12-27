@@ -13,8 +13,8 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      title={siteConfig.title}
-      description="Description will go into a meta tag in <head />"
+      title=""
+      description="技术和生活"
     >
       <main>
         <div className="timeLine-container">
