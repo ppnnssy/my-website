@@ -101,3 +101,140 @@ invalid状态：`invalid:text-red-500`
 ```
 li上命名item，a上命名edit，这样就可以区分是哪个父元素触发了。
 
+TODO
+还有个任意groups，但是没搞懂，选择器只能选出第一个，以后再学吧，反正也用不到。  
+官方文档： https://www.tailwindcss.cn/docs/hover-focus-and-other-states#arbitrary-groups  
+
+## 5.根据兄弟状态进行样式设置(peer- \{modifier\})
+很明显跟上面的父状态用法类似，peer标记，peer-状态使用。  
+```
+<form>
+  <label class="block">
+    <span class="block text-sm font-medium text-slate-700">Email</span>
+    <input type="email" class="peer ..."/>
+    <p class="mt-2 invisible peer-invalid:visible text-pink-600 text-sm">
+      Please provide a valid email address.
+    </p>
+  </label>
+</form>
+```
+
+要特别注意的是，<strong>要先声明再使用</strong>，即下面的使用方法是<font color="red">错误</font>的：  
+```
+<label>
+  <span class="peer-invalid:text-red-500 ...">Email</span>
+  <input type="email" class="peer ..."/>
+</label>
+```
+
+同辈的区分当然也是差不多的用法：  
+命名：`peer/draft`  
+使用： `peer-checked/draft:text-sky-500`  
+
+TODO  
+任意选择还是没搞懂😡
+
+
+## 6. 可以在父元素上直接设置子元素的样式(*- \{modifier\} )
+```
+<div>
+   <ul class="*:rounded-full *:border *:border-sky-100 *:bg-sky-50 *:px-2 *:py-0.5 dark:text-sky-300 dark:*:border-sky-500/15 dark:*:bg-sky-500/10">
+    <li>Sales</li>
+    <li>Marketing</li>
+    <li>SEO</li>
+  </ul>
+</div>
+```
+
+但是这样子元素本身就无法改变自己的样式：  
+` <li class="bg-red-500">Sales</li>`不会生效  
+
+## 7. 根据后代设置样式(has- \{modifier\} )
+使用`has-[:伪类]:样式`这样的格式，比如：  
+```
+<label class="has-[:checked]:bg-indigo-50 has-[:checked]:text-indigo-900 has-[:checked]:ring-indigo-200 ..">
+  <svg fill="currentColor">
+    <!-- ... -->
+  </svg>
+  Google Pay
+  <input type="radio" class="checked:border-indigo-500 ..." />
+</label>
+```
+
+可以和group、peer一起使用，分别用来选择父元素的后代、同辈的后代。  
+```
+group-has-[a]:block
+peer-has-[:checked]:hidden
+```
+
+## 8. 响应式设计——媒体查询  
+使用响应式设计时，首先在head中引入viewport meta tag：`<meta name="viewport" content="width=device-width, initial-scale=1.0">`  
+然后可以根据窗口的宽度写不同的样式：`<img class="w-16 md:w-32 lg:w-48" src="...">`  
+![alt text](image-1.png)
+
+如果上面的断点不够用，可以在tailwind.config.js自定义：  
+```
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  theme: {
+    screens: {
+      'tablet': '640px',
+      // => @media (min-width: 640px) { ... }
+
+      'laptop': '1024px',
+      // => @media (min-width: 1024px) { ... }
+
+      'desktop': '1280px',
+      // => @media (min-width: 1280px) { ... }
+    },
+  }
+}
+```
+
+如果一个断点数值只需要使用一次，可以直接这样：  
+```
+<div class="min-[320px]:text-center max-[600px]:bg-sky-300">
+  <!-- ... -->
+</div>
+```
+
+## 9. 主题色——暗黑模式
+加一个dark前缀就行：`bg-white dark:bg-slate-800`  
+具体如何在项目中开启暗色模式，参考官网： https://www.tailwindcss.cn/docs/dark-mode
+
+## 10. 关于重复使用样式
+如果有需要重复使用的样式，比如一个list样式，官方建议是可以使用map，或者封装组件。  
+如果是高度可复用，并且比较简短的样式，比如button，可以使用`@apply`提取，方法如下：  
+```
+html:
+<button class="btn-primary">
+  Save changes
+</button>
+
+css:
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply py-2 px-5 bg-violet-500 text-white font-semibold rounded-full shadow-md hover:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-400 focus:ring-opacity-75;
+  }
+}
+
+```
+
+这个谨慎使用，官方不太建议这样写  
+![alt text](image-2.png)
+
+## 11.使用任意值
+预设的类名有h-2,h-4这样的，如果想要一个介于这两者之间的值，可以使用任意值：  
+```
+<div class="top-[117px]">
+  <!-- ... -->
+</div>
+```
+[]里可以写各种东西，函数、变量名、具体值都行。  
+
+如果任意值包含空格，用下划线代替：`class="grid grid-cols-[1fr_500px_2fr]"`  
+
