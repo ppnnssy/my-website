@@ -31,6 +31,52 @@ Next是分服务端渲染和客户端渲染的，当跟链上交互的时候，�
 不过现在海外tailwind大势所趋，很多轮子都是用这个，所以还是得学。  
 
 总结一下使用过程中遇到的问题：
+1. 背景图设置  
 设置背景图，图片URL是个变量，使用拼接字符串不起作用。最后只能写内敛样式表。  
+```
+  <div
+      style={{
+        backgroundImage: `url(${coinInfo[item.type]?.iconUrl})`,
+      }}
+      className={`bg-no-repeat  bg-center bg-cover h-14 w-14 mr-3`}
+    ></div>
+```
 
+2. 深度选择器  
+想要更改第三方库的样式，使用Tailwind无法实现，最终还是需要使用css。  
+方法就是传统的给父元素加类名，然后在css文件中直接选择类，然后引入css文件
+```
+  return <div className='fa'>
+    <Collapse items={items} defaultActiveKey={['1']} onChange={onChange} />
+  </div>;
 
+  // 引入css
+  // page.css:
+.fa .ant-collapse .ant-collapse-item .ant-collapse-header .ant-collapse-header-text{
+    color:red
+}
+.fa{
+    background-color: white;
+}
+```
+
+3. 动态类名  
+就是使用拼接字符串，感觉蠢蠢的  
+```
+"use client";
+import React, { useState } from "react";
+
+const Send = () => {
+  const [color, setColor] = useState("white");
+  return (
+    <div
+      className={`w-28  h-28 bg-${color} `}
+      onClick={() => {
+        setColor(color == "white" ? "red-600" : "white");
+      }}
+    >
+    </div>
+  );
+};
+export default Send;
+```
