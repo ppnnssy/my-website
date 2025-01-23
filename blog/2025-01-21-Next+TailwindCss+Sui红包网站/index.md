@@ -38,7 +38,7 @@ Next 是分服务端渲染和客户端渲染的，当跟链上交互的时候，
 1. 背景图设置  
    设置背景图，图片 URL 是个变量，使用拼接字符串不起作用。最后只能写内敛样式表。
 
-```
+```jsx
   <div
       style={{
         backgroundImage: `url(${coinInfo[item.type]?.iconUrl})`,
@@ -51,7 +51,8 @@ Next 是分服务端渲染和客户端渲染的，当跟链上交互的时候，
    想要更改第三方库的样式，使用 Tailwind 无法实现，最终还是需要使用 css。  
    方法就是传统的给父元素加类名，然后在 css 文件中直接选择类，然后引入 css 文件
 
-```
+```jsx
+
   return <div className='fa'>
     <Collapse items={items} defaultActiveKey={['1']} onChange={onChange} />
   </div>;
@@ -69,7 +70,7 @@ Next 是分服务端渲染和客户端渲染的，当跟链上交互的时候，
 3. 动态类名  
    就是使用拼接字符串，感觉蠢蠢的
 
-```
+```jsx
 "use client";
 import React, { useState } from "react";
 
@@ -90,6 +91,66 @@ export default Send;
 
 ## Sui 链上交互
 
+### Provider  
+在使用库与链上交互，或者使用库组件的时候，需要先在顶层组件包裹一个 Provider。  
+这里有个坑，由于使用的是Next，分前后端渲染，而Provider 只在客户端渲染，所以需要在顶层组件包裹一个`"use client"`。  
+与之矛盾的是，想要添加元数据，需要在服务端渲染，不能使用`"use client"`。  
+
+解决方法是把Provider单独提取出来，做成一个组件，然后包裹顶层layout。
+Provider.js:  
+```jsx
+"use client";
+import React from "react";
+import "@mysten/dapp-kit/dist/index.css";
+import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { networkConfig } from "./networkConfig.js";
+
+const queryClient = new QueryClient();
+
+export default function Provider({ children }) {
+  return (
+        <React.StrictMode>
+          <QueryClientProvider client={queryClient}>
+            <SuiClientProvider
+              networks={networkConfig}
+              defaultNetwork="testnet"
+            >
+              <WalletProvider autoConnect>
+                {children}
+              </WalletProvider>
+            </SuiClientProvider>
+          </QueryClientProvider>
+        </React.StrictMode>
+  );
+}
+```
+
+layout.js:  
+```jsx
+import "./globals.css";
+import React from "react";
+import "@mysten/dapp-kit/dist/index.css";
+import "@ant-design/v5-patch-for-react-19";
+import Provider from "@/components/Provider";
+export const metadata = {
+  title: "发个红包",
+  description: "A Next.js client-side page example with metadata.",
+};
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body className="bg-black">
+        <Provider> {children}</Provider>
+      </body>
+    </html>
+  );
+}
+```
+
+
+
+### 调用合约函数
 链上交互主要依靠`@mysten`库中的"@mysten/dapp-kit"，"@mysten/sui/transactions"  
 Sui 官方文档： https://docs.sui.io/guides  
 @mysten 库官方文档： https://sdk.mystenlabs.com/typescript/migrations/sui-1.0
@@ -189,6 +250,7 @@ export const splitCoins = async (txb, coin, coinType, amount, decimals) => {
 };
 ```
 
+实际使用：  
 ```js
 import { Transaction } from "@mysten/sui/transactions";
 import {
